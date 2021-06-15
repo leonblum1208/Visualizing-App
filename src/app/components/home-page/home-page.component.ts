@@ -16,10 +16,10 @@ interface portfolioItems{
 export class HomePageComponent implements OnInit {
 
   public portfolioItems:portfolioItems[] = [
-    {viewValue: "Pathfinding", routerLink: "/pathfinding", imgPath:"../../../assets/data/images/pathfinding_drone_snow_serpentine.jpg"},
-    {viewValue: "Sorting", routerLink: "/sorting", imgPath:"../../../assets/data/images/sorting_berries.jpg"},
-    {viewValue: "Machine Learning", routerLink: "/car-ai", imgPath:"../../../assets/data/images/AI_Synapse.jpg"},
-    {viewValue: "Coming Soon", routerLink: "/home", imgPath:"../../../assets/data/images/railway_nature.jpg"},
+    {viewValue: "Pathfinding", routerLink: "/pathfinding", imgPath:"assets/data/images/pathfinding_drone_snow_serpentine.jpg"},
+    {viewValue: "Sorting", routerLink: "/sorting", imgPath:"assets/data/images/sorting_berries.jpg"},
+    {viewValue: "Machine Learning", routerLink: "/car-ai", imgPath:"assets/data/images/AI_Synapse.jpg"},
+    {viewValue: "Coming Soon", routerLink: "/home", imgPath:"assets/data/images/railway_nature.jpg"},
   ]
   
 

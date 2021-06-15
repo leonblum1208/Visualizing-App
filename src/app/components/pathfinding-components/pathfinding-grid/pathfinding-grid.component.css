@@ -1,0 +1,49 @@
+/* #3f51b5 primary */
+/* #ff4081  accent */
+/* #f44336 warn */
+
+
+.grid{
+  border: 20px solid white; 
+  height: 100%;
+  user-select: none;
+  border-spacing: 1px;
+  background-color: white;
+}
+
+.isStart{
+  background-color: rgb(157, 238, 35); 
+  cursor: move;
+}
+
+.isEnd{
+  background-color: rgb(220, 0, 0);
+  cursor: move;
+}
+
+.isWall{
+  background-color: grey;
+}
+
+.unvisited{
+  background-color: lightgrey;
+
+}
+
+.visited{
+  background-color:  #3f51b5;
+}
+
+.inPath{
+  background-color: #ff4081;
+}
+
+
+.inShowShortestPath{
+  background-color: rgb(255, 208, 0);
+}
+
+ /* @keyframes wall {
+  0% {background-color:lightgrey; transform: scale(0.5);}
+  100% {transform: scale(1); background-color:grey;}
+}  */

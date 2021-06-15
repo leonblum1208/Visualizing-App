@@ -1,0 +1,209 @@
+<mat-toolbar style="height: 100%; flex-wrap: nowrap;">
+
+
+    <button mat-fab (click) = "carAIService.carAISideNavOpened = !carAIService.carAISideNavOpened" color= "primary"
+    *ngIf = "!carAIService.carAISideNavOpened; else closeSidebarArrow">
+      <mat-icon >menu</mat-icon>
+    </button>
+
+    <ng-template #closeSidebarArrow>
+      <button mat-fab (click) = "carAIService.carAISideNavOpened = !carAIService.carAISideNavOpened" color= "primary" >
+        <mat-icon style="font-size: 40px; position: relative; bottom: 9px; right: 8px">
+          keyboard_backspace
+      </mat-icon> 
+      </button>
+    </ng-template>
+
+    <span style="flex: 1 0 5px;"></span>
+
+    <!-- Track Chooser -->
+    <div style="flex: 1 1 200px; display: flex; flex-flow: column;">
+    <mat-form-field appearance="fill" style="flex: 1 1 auto; position: relative; top: 10px" >
+      <mat-label>Racetrack</mat-label>
+      <mat-select  style="flex: 1 1 auto;"
+      [(ngModel)] = "carAIService.selectedTrack" [disabled] = "carAIService.evolutionLoopRunning || carAIService.gameLoopRunning" 
+      (selectionChange) = carAIService.loadNewTrack() >
+        <mat-option *ngFor="let track of carAIService.tracks" [value]="track">
+          <div> 
+            {{track.viewValue}} 
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; position: relative; bottom: 12px;">
+      <mat-slider style="flex: 1 1 auto;" color = "primary" min=1 max=10 step=1 [(ngModel)]="carAIService.stopAfterXLaps"></mat-slider>
+      <label>{{carAIService.stopAfterXLaps}} Lap[s] </label>
+    </div>
+
+    <mat-slide-toggle color = "primary"  
+              [(ngModel)] = "carAIService.showCheckpoints" 
+              (change) = "carAIService.renderOneFrame()" 
+              style="flex: 1 1 auto;  position: relative; bottom: 12px; left:8px">
+                  Show Checkpoints
+    </mat-slide-toggle>
+
+  </div>
+
+    <span style="flex: 1 0 5px;"></span>
+
+    
+    <!-- Sliders -->
+
+    <div style="flex: 3 1 200px; display: flex; flex-flow: column;">
+
+      <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "primary" min=0 max=10 step = 0.1 [(ngModel)]="carAIService.speedFactor"></mat-slider>
+        <mat-icon style="margin: 5px;">speed</mat-icon>
+        <label>{{carAIService.speedFactor}}</label>
+      </div>
+
+
+      <div style=" width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "primary" 
+        min=1 [max]="carAIService.maxPopulation"
+        [(ngModel)]="carAIService.populationSize" >
+        </mat-slider>
+        <mat-icon style="margin: 5px; ">directions_car</mat-icon>
+        <label>{{carAIService.populationSize}}</label>
+      </div>
+
+      <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "primary" min=1000 max=500000 step=1000 [(ngModel)]="carAIService.timePerGeneration"></mat-slider>
+        <mat-icon style="margin: 5px;">timer</mat-icon>
+        <label>{{round(carAIService.timePerGeneration/1000,0)}}s</label>
+      </div>
+
+    </div>
+
+    <span style="flex: 1 0 5px;"></span>
+
+
+    <!-- Main Control Button -->
+    <div style="flex: 1 1 200px; display: flex; flex-flow: column;">
+
+      <span style="flex: 1 1 10px;"></span>
+
+      <div  [ngSwitch] = "carAIService.loopControlButton" style="flex: 1 1 auto; display: flex; flex-flow: row;">
+
+        <button *ngSwitchCase= "'start'" 
+        class="mat-headline" mat-raised-button color="accent" 
+        (click) = "carAIService.startEvolution()" 
+        [disabled] = "carAIService.singlePlayerMode"
+        style="position: relative;  font-size: 36px; height: 60px; width: 240px; flex: 0 0 auto;">
+        Start
+        </button>
+
+        <button *ngSwitchCase= "'pause'" 
+        class="mat-headline" mat-raised-button color="primary" 
+        (click) = "carAIService.pauseAfterGeneration()" 
+        [disabled] = "carAIService.singlePlayerMode"
+        style="position: relative;  font-size: 26px; height: 60px; width: 240px; flex: 0 0 auto;">
+        Pause after Run
+        </button>
+
+        <button *ngSwitchCase= "'stop'" 
+        class="mat-headline" mat-raised-button color="warn" 
+        (click) = "carAIService.stopEvolution()" 
+        [disabled] = "carAIService.singlePlayerMode"
+        style="position: relative;  font-size: 36px; height: 60px; width: 240px; flex: 0 0 auto;">
+        Force Stop
+        </button>
+
+      </div>
+
+      <span style="flex: 1 1 10px;"></span>
+
+      <button class="mat-headline" mat-stroked-button color="primary" 
+      (click) = "carAIService.skipToNextGen()" 
+      [disabled] = "carAIService.singlePlayerMode"
+      style="position: relative;  font-size: 20px; height: 50px; width: 240px; flex: 0 0 auto;">
+      Skip to next Generation
+      </button>
+
+      <span style="flex: 1 1 5px;"></span>
+
+      <mat-progress-bar 
+      mode="determinate" 
+      [value]="carAIService.singlePlayerMode ? 0 : carAIService.curSimulationTime*100/carAIService.timePerGeneration"
+      style="flex: 0 0 auto; width: 240px; "> 
+     </mat-progress-bar>
+
+      <span style="flex: 1 1 20px;"></span>    
+      
+      <mat-slide-toggle color = "primary"  
+        [(ngModel)] = "carAIService.singlePlayerMode" 
+        (change) = "carAIService.toggleSinglePlayerMode()" 
+        [disabled] = "carAIService.evolutionLoopRunning"
+        style="flex: 1 1 auto;  position: relative; bottom: 12px; left:8px">
+            Single Player Mode
+      </mat-slide-toggle>
+    
+    </div>  
+
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+
+
+    <!-- Important Stats -->
+
+    <mat-card style="margin-top: 5px; margin-bottom: 5px; display: flex; flex-flow: column;padding: 5px">
+      <mat-card-content>
+          <table style = "font-size: 20px; font-weight: 400; line-height: 22px; ">
+            <tr style="font-weight: 600;"> <td>Generation </td> <td>{{carAIService.generation}}</td> <td> </td>  </tr>
+            <tr> <td>Cars Moving </td> <td>{{carAIService.carsMoving}}</td> <td> </td>  </tr>    
+            <tr> <td>Average Distance</td> <td>{{round(carAIService.averageDistance * 100, 1)}}</td> <td> % </td>  </tr>    
+            <tr> <td style="width: 200px;">Real Time </td> 
+              <td style="width: 80px;">{{round(carAIService.curRealTime/1000, 1)}}</td> <td>s </td>  </tr>
+            <tr> <td>Simulation Time </td> <td>{{round(carAIService.curSimulationTime/1000, 1)}}</td> <td>s </td>  </tr>
+            <tr [ngSwitch] = "carAIService.computationalLimitEvaluation"> <td>Computational Perf. </td> 
+              <td colspan="2" *ngSwitchCase= "'excellent'" style="color: var(--green-base);">{{carAIService.computationalLimitEvaluation}}</td>
+              <td colspan="2" *ngSwitchCase= "'good'" style="color: var(--primary);">{{carAIService.computationalLimitEvaluation}}</td>
+              <td colspan="2" *ngSwitchCase= "'managable'" style="color: var(--yellow-base);">{{carAIService.computationalLimitEvaluation}}</td>
+              <td colspan="2" *ngSwitchCase= "'bad'" style="color: var(--warn-base);">{{carAIService.computationalLimitEvaluation}} - Reduce Cars</td>               
+            </tr>                 
+          </table> 
+      </mat-card-content>                    
+  </mat-card>  
+
+
+
+    <span style="flex: 3 0 5px;"></span> 
+
+    <!-- Reset Portion -->
+
+    <div style="flex: 1 1 80px; display: flex; flex-flow: column;">
+
+      <button *ngIf ="!carAIService.singlePlayerMode"
+        class="mat-headline" mat-raised-button color = "warn" 
+        (click) = "carAIService.resetGame()" 
+        [disabled] = "carAIService.evolutionLoopRunning"
+        style="position: relative;  font-size: 36px; height: 60px;  flex: 0 0 auto;">
+        Reset
+      </button>
+
+      <button *ngIf ="carAIService.singlePlayerMode"
+        class="mat-headline" mat-raised-button color = "primary" 
+        (click) = "carAIService.resetGame()" 
+        [disabled] = "carAIService.evolutionLoopRunning"
+        style="position: relative;  font-size: 36px; height: 60px;  flex: 0 0 auto;">
+        Restart Car
+      </button>
+
+      <div style=" width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "warn" 
+        min= 4 max= 20
+        [disabled] = "carAIService.evolutionLoopRunning || carAIService.gameLoopRunning"
+        [(ngModel)]="carAIService.pixelPerMeter" 
+        (change) = "carAIService.resetGame()" 
+        >     
+        </mat-slider>
+        <mat-icon style="margin: 5px; ">aspect_ratio</mat-icon>
+        <label>{{"  "+ carAIService.gameWidth}}px</label>
+      </div>
+    </div>
+
+
+</mat-toolbar>

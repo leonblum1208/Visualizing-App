@@ -1,0 +1,12 @@
+
+<div class = "bars-wrapper">
+    <div *ngFor = "let sortingBar of sortservice.barArray"
+    class =  {{sortingBar.type}}
+    id = {{sortingBar.id}}  
+    [style.height] = sortingBar.height
+    >
+        <label *ngIf = "sortservice.showNumbers" 
+        [style.font-size] = sortingBar.fontSize
+        >{{sortingBar.value}}</label>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<body style="       
+    display: flex;
+    flex-flow: column;
+    width: 100%;">  
+
+    <app-main-nav-bar style="flex: 0 1 auto"></app-main-nav-bar>
+
+    <div class="gridPortfolioContainer">
+
+        <div 
+        *ngFor = "let item of portfolioItems"  
+        class="gridPortfolioItem"
+        [routerLink]= item.routerLink
+        style="background-image: url({{item.imgPath}});"
+        >   
+
+            <div class= "gridPortfolioLabel">
+                {{item.viewValue}} 
+            </div>
+        
+        </div>
+
+    </div>
+
+</body>

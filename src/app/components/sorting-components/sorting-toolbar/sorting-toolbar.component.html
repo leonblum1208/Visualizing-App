@@ -1,0 +1,178 @@
+<mat-toolbar style="height: 100%; flex-wrap: nowrap;">
+
+
+    <button mat-fab (click) = "sortservice.sortingSideNavOpened = !sortservice.sortingSideNavOpened" color= "primary"
+    *ngIf = "!sortservice.sortingSideNavOpened; else closeSidebarArrow">
+      <mat-icon >menu</mat-icon>
+    </button>
+
+    <ng-template #closeSidebarArrow>
+      <button mat-fab (click) = "sortservice.sortingSideNavOpened = !sortservice.sortingSideNavOpened" color= "primary" >
+        <mat-icon style="font-size: 40px; position: relative; bottom: 9px; right: 8px">
+          keyboard_backspace
+      </mat-icon> 
+      </button>
+    </ng-template>
+
+
+
+    <span style="flex: 0 0 30px;"></span>
+
+
+    <!-- Algorithm Chooser -->
+    <mat-form-field appearance="fill" style="position: relative ; top: 12px; overflow:hidden; flex: 0 0 200px;" >
+      <mat-label >Algorithm</mat-label>
+      <mat-select  [(ngModel)] = "sortservice.selectedAlgorithm" [disabled] = "sortservice.currentlyAutoPlaying" (selectionChange) = sortservice.updateState()>
+        <mat-option *ngFor="let algorithm of sortservice.algorithms" [value]="algorithm">
+          <div> 
+            {{algorithm.viewValue}} 
+          </div>
+        </mat-option>
+
+      </mat-select>
+    </mat-form-field>
+
+
+    <!-- Info Button -->
+    <button mat-icon-button (click) = "sortservice.algoInfoShown = !sortservice.algoInfoShown" 
+    *ngIf = "!sortservice.algoInfoShown; else closeAlgoInfo" >
+      <mat-icon >info</mat-icon>
+    </button>
+
+    <ng-template #closeAlgoInfo>
+      <button mat-mini-fab (click) = "sortservice.algoInfoShown = !sortservice.algoInfoShown" style="align-items: baseline;" color="warn">
+        <mat-icon >close</mat-icon>
+      </button>
+    </ng-template>
+
+    
+    <!-- Pop-Up -->
+    <mat-card style="position: absolute; top: 120px; display: flex; flex-flow: column;"  
+    *ngIf = "sortservice.algoInfoShown" >    
+      <iframe #algoWiki src="https://en.wikipedia.org/wiki/Sorting_algorithm#Popular_sorting_algorithms" 
+      frameborder="0" width= "1360px" height="740px">
+      </iframe>
+    </mat-card>
+    
+
+    <span style="flex: 0 0 30px;"></span>
+
+
+    <!-- Sliders -->
+    <div style="flex: 1 1 200px; display: flex; flex-flow: column;">
+
+      <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "primary" min=1 max=9 [(ngModel)]="sortservice.speedValue"></mat-slider>
+        <mat-icon style="margin: 5px;">speed</mat-icon>
+        <label>{{"  "+sortservice.speedValue}}</label>
+      </div>
+
+
+      <div style=" width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" (change)="sortservice.updateState()" color = "primary" 
+        min=8 [max]="sortservice.maxArraySize"
+        [(ngModel)]="sortservice.arrayLength" [disabled] = sortservice.currentlyAutoPlaying>
+        </mat-slider>
+        <mat-icon style="margin: 5px; ">leaderboard</mat-icon>
+        <label>{{"  "+ sortservice.arrayLength}}</label>
+      </div>
+
+    </div>
+
+
+    <span style="flex: 0 0 50px;"></span>
+
+
+    <!-- Sorting Step Naviagation -->
+    
+    <div style="flex: 5 1 200px; display: flex; flex-flow: column;">
+
+      <span style="flex: 0 0 10px;"></span>
+
+      <div style=" width:100%; display: flex; flex-flow: row; flex: 1 1 50px;">
+
+      <button mat-raised-button color="primary"  [disabled] = sortservice.currentlyAutoPlaying
+      (click) = "sortservice.goPrevStepInAnimation()" 
+      style="flex: 1 1 auto;">
+      <mat-icon style="font-size: 40px; position: relative; bottom: 7px; right:7px"> skip_previous </mat-icon>
+      </button>
+
+      <span style="flex: 0 0 5px;"></span>
+
+      <div [ngSwitch] = "sortservice.playButton" style="flex: 1 1 auto; display: flex; flex-flow: row;">
+
+        <button *ngSwitchCase= "'play'" 
+        class="mat-headline" mat-raised-button color="accent" 
+        (click) = "sortservice.toggleAutoPlay()" 
+        style="flex: 1 1 auto; font-size: 30px;">
+        Sort
+        </button>
+
+        <button *ngSwitchCase= "'stop'" 
+        class="mat-headline" mat-raised-button color="warn" (click) = "sortservice.toggleAutoPlay()" 
+          style="flex: 1 1 auto;font-size: 30px;">
+        Stop!
+        </button>
+
+        <button *ngSwitchCase= "'reset'" 
+        class="mat-headline" mat-raised-button color="accent" (click) = "sortservice.catchUpWithSlider(-1)" 
+          style="flex: 1 1 auto;">
+          <mat-icon style="font-size: 40px; position: relative; bottom: 7px; right:7px"> replay </mat-icon>
+        </button>
+
+      </div>
+
+
+      <span style="flex: 0 0 5px;"></span>
+
+      <button mat-raised-button color="primary" [disabled] = sortservice.currentlyAutoPlaying
+      (click) = "sortservice.goNextStepInAnimation()" 
+      style="flex: 1 1 auto;">
+      <mat-icon style="font-size: 40px; position: relative; bottom: 7px; right:7px"> skip_next </mat-icon>
+      </button>
+  
+      </div>
+
+      <mat-slider 
+      color = "primary" 
+      min= -2
+      [max]= sortservice.AnimationArray.length 
+      (input) = sortservice.catchUpWithSlider($event.value)
+      [value]="sortservice.currentSliderPosition" 
+      [disabled] = sortservice.currentlyAutoPlaying
+      style="flex: 0 1 auto">
+      </mat-slider>
+
+    
+    </div>
+
+
+    <span style="flex: 0 0 30px;"></span>
+
+
+    <!-- Make New Array -->
+    <button mat-raised-button color="primary" (click) = "sortservice.updateState()" [disabled] = sortservice.currentlyAutoPlaying 
+    style="flex: 0 0 auto;">
+      <div style="position: relative; top: 8px; flex: 0 0 auto;" class="mat-headline" >New Array</div>    
+    </button>
+
+
+    <span style="flex: 0 0 30px;"></span>
+
+
+    <!-- Number Property -->
+    <mat-form-field appearance="fill" style="position: relative ; top: 12px; overflow:hidden; flex: 0 0 230px;" >
+      <mat-label >Number Property</mat-label>
+      <mat-select  [(ngModel)] = "sortservice.currentNumberProperty" [disabled] = "sortservice.currentlyAutoPlaying" (selectionChange) = sortservice.updateState()>
+        <mat-option *ngFor="let numberproperty of sortservice.numberProperties" [value]="numberproperty">
+          <div> 
+            {{numberproperty.viewValue}} 
+          </div>
+        </mat-option>
+
+      </mat-select>
+    </mat-form-field>
+
+    <span style="flex: 0 0 30px;"></span>
+
+</mat-toolbar>

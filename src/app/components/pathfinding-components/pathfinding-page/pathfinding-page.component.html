@@ -1,0 +1,225 @@
+<body style="       
+    display: flex;
+    flex-flow: column;">
+
+    <app-main-nav-bar style="flex: 0 1 auto;"></app-main-nav-bar>
+
+
+    <mat-drawer-container style="
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    "   hasBackdrop="false">
+
+        <mat-drawer mode="side" [(opened)]="pathservice.pathFindingSideNavOpened"
+        style="
+        flex: 1 1 auto;
+        width: 425px;
+        padding: 15px;
+        background-color: rgb(235, 235, 235);
+        ">
+        
+            <mat-card style="margin-bottom: 15px; display: flex; flex-flow: column;">
+
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px;"> A* Heuristic Functions</mat-card-title>
+                </mat-card-header>
+
+                <div style= "display: flex; flex-flow: row;">
+                    <mat-form-field appearance="fill" 
+                    style="position: relative ; top: 12px; overflow:hidden; font-size: 20px; width: 300px" >
+                        <mat-label >Heuristic Function</mat-label>
+                        <mat-select (selectionChange) = "pathservice.updateVisited()" [(ngModel)] = "pathservice.selectedHeuristic" 
+                        [disabled] = "pathservice.currentlyAnmiating || pathservice.selectedAlgorithm.id != 'a*'"
+                        >
+                        <mat-option *ngFor="let heuristic of pathservice.heuristics" [value]="heuristic">
+                            {{heuristic.viewValue}}
+                        </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <!-- Info Button -->
+                    <button mat-icon-button (click) = "pathservice.heuristicInfoShown = !pathservice.heuristicInfoShown" style="position: relative; top: 30px;">
+                    <mat-icon>info</mat-icon>
+                    </button>
+                </div> 
+
+                <div *ngIf ="pathservice.heuristicInfoShown">
+                    <p style="color: grey; font-size: 16px; text-align: justify"> The A* Algorithm builds upon Dijkstra's. 
+                        In addition to taking the distance to the start node into account, 
+                        A* estimates the distance to the end Node aswell. In order to estimate the distance to the end Node, 
+                        a Heuristic Function is used. The estimated distance to the End Node is currently calculated by using:
+                    </p>    
+ 
+                    <p *ngIf="pathservice.selectedHeuristic.id === 'manhatten-distance'" style="color: grey; font-size: 18px;line-height: 150%;">
+                        Estimated Distance to End Node  = 
+                        <br>
+                        {{pathservice.selectedHeuristic.viewValue}} = 
+                        <br>                 
+                        |&Delta;x| + |&Delta;y| </p>
+                    <p *ngIf="pathservice.selectedHeuristic.id === 'diagonalManhatten'" style="color: grey; font-size: 18px;"> 
+                        Estimated Distance to End Node  = 
+                        <br>
+                        {{pathservice.selectedHeuristic.viewValue}} = 
+                        <br>
+                        |&Delta;x| + |&Delta;y| - min(&Delta;x, &Delta;y) * (2 - sqrt(2)) </p>
+                    <p *ngIf="pathservice.selectedHeuristic.id === 'beeline'" style="color: grey; font-size: 18px;"> 
+                        Estimated Distance to End Node  = 
+                        <br>
+                        {{pathservice.selectedHeuristic.viewValue}} = 
+                        <br>
+                        sqrt(&Delta;x² + &Delta;y²) </p>
+                </div>    
+
+                <span style="flex: 0 0 15px;"></span>
+
+                <div>
+                    <label class="mat-title">Weighting Factor <b> &epsilon;</b></label>
+                </div>
+               
+                <div>    
+                <mat-slider  (change)="pathservice.updateVisited()" color = "primary" min=0 max=10 step="0.1"
+                [(ngModel)]="pathservice.heuristicWeight" [disabled] = "pathservice.currentlyAnmiating || pathservice.selectedAlgorithm.id != 'a*'"
+                style="width: 260px;">            
+                </mat-slider>
+                <label class="mat-headline">{{"  "+ pathservice.heuristicWeight}}</label>
+                <!-- Info Button -->
+                <button mat-icon-button (click) = "pathservice.heuristicWeightingInfo = !pathservice.heuristicWeightingInfo" style="position: relative; bottom: 3px;">
+                    <mat-icon>info</mat-icon>
+                </button>
+                </div> 
+
+                <div *ngIf ="pathservice.heuristicWeightingInfo">
+                    <p style="color: grey; font-size: 16px; text-align: justify"> 
+                        To further costumize the behavior of A*, the result of the heuristic function can be weighted. 
+                        At a weighting-factor(&epsilon;) of 10 the result of the heuristic function is multiplied by ten. 
+                        Then it is added to the distance to the start node and set as the heuristic value of the the current node. 
+                        <br>
+                        This leeds to a greedy behavior with fewer nodes visited, at the cost of a potentially suboptimal path.
+                        The shortest path is no longer guaranteed, because the distance to the end node is not guaranteed to be correct and is now getting overweigthed. 
+                        You can observe this behavior when positioning the nodes diagonally to each other, 
+                        placing a "L"-shpaed wall pointing to the End Node inbetween, enabling "Diagonals" and set &epsilon; to 10.
+                        <br>
+                        If &epsilon; <= 1 and the heuristic function is valid for the given case the shortest path is guaranteed. 
+                        For example the manhatten distance function is only valid if diagonal pathing is disabled.
+                        <br>
+                        One more thing: If &epsilon; = 0 the A* Algorithm is actually identical to Dijkstra's. 
+                        Thus Dijkstra's can be seen as a special case of the A* Algorithm with &epsilon; = 0.
+                    </p>    
+                    <p style="color: grey; font-size: 18px; line-height: 150%;"> 
+                        Heuristic Value = 
+                        <br> 
+                        (Heuristic Function) * &epsilon; + DistToStart =
+                        <br>
+                        ({{pathservice.selectedHeuristic.viewValue}}) * {{pathservice.heuristicWeight}} + DTS </p>
+
+                </div> 
+
+
+
+            </mat-card>
+
+
+            <mat-card style="margin-bottom: 15px; display: flex; flex-flow: column;">
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px; "> Statistics</mat-card-title>
+                </mat-card-header>
+
+                <div [hidden] = pathservice.animationVisible style="color: grey; font-size: 18px;"> 
+                    Visualize once to see Statistics</div>
+
+                <table [hidden] = !pathservice.animationVisible style="font-size: 18px; border-spacing: 5px;">
+                    <tr> <td>Visited Nodes</td> <td>{{pathservice.visitedNodes}}</td>  </tr>
+                    <tr> <td>Number of Nodes</td> <td>{{pathservice.numberofNodes}}</td>  </tr>
+                    <tr> <td>Percentage of Nodes Visited &nbsp; &nbsp; &nbsp;</td> <td>{{pathservice.percentageofNodesVisited}} %</td>  </tr>
+                    <tr> <td>Length of Shortest Path</td> <td>{{pathservice.lengthofShortestPath}}</td>  </tr>
+                    <tr> <td>Length of Calculated Path</td> <td>{{pathservice.lengthofCalculatedPath}}</td>  </tr>
+                </table> 
+                
+                <span style="flex: 0 0 15px;"></span>
+
+                <button [disabled] = "!pathservice.animationVisible || pathservice.lengthofShortestPath === pathservice.lengthofCalculatedPath" 
+                mat-raised-button color="primary" style="font-size: 20px;"
+                (click) = "pathservice.showaShortestPath()">Show a Shortest Path</button>    
+                       
+            </mat-card>
+
+
+
+            
+
+            <mat-card style="margin-bottom: 15px;">
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px;"> Node Color Legend</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-list role="list">
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: lightgrey; margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Unvisited </div>
+                        </mat-list-item>
+            
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: grey; margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Wall </div>
+                        </mat-list-item>
+            
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color:  #3f51b5; margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Visited </div>
+                        </mat-list-item>
+            
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: #ff4081; margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Calculated Path </div>
+                        </mat-list-item>
+
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: rgb(255, 208, 0); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> A Shortest Path </div>
+                        </mat-list-item>
+            
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: rgb(157, 238, 35); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Start Node </div>
+                        </mat-list-item>
+            
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 35px; background-color: rgb(220, 0, 0); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> End Node </div>
+                        </mat-list-item>
+
+                
+                    </mat-list>
+                </mat-card-content>
+            </mat-card>
+
+
+        </mat-drawer>
+
+
+        <mat-drawer-content style="
+        flex: 1 1 auto;
+        display: flex;
+        flex-flow: column;">
+    
+            <app-toolbar-pathfinding style="flex: 0 1 auto;"> </app-toolbar-pathfinding>
+
+            <app-pathfinding-grid style="  
+            display: flex;
+            flex-flow: column;
+            flex: 1 1 auto;
+            ">
+            </app-pathfinding-grid>
+
+
+        </mat-drawer-content>
+
+    </mat-drawer-container>
+
+
+
+
+</body>
+

@@ -1,0 +1,673 @@
+<body style="       
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    height: 100%;
+    ">
+
+    <app-main-nav-bar style="flex: 0 1 auto;"></app-main-nav-bar>
+
+    <mat-drawer-container style="
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    height: 100%;
+    "   hasBackdrop="false">
+
+        <mat-drawer mode="side" [(opened)]="carAIService.carAISideNavOpened"
+        style="
+        flex: 1 1 auto;
+        width: fit-content;
+        padding: 15px;
+        background-color: rgb(235, 235, 235);
+        ">  
+            <!-- Legend -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = true>
+                <mat-expansion-panel-header style="font-size: 30px; ">
+                Car Color Legend
+                </mat-expansion-panel-header>
+                <mat-list role="list">
+                    <mat-list-item role="listitem" style="align-items:baseline;">
+                        <div style="height: 35px; width: 20px; background-color: var(--primary-base); margin-right: 10px;"></div>
+                        <div class="mat-headline" style="position: relative; top: 8px;"> Active Car </div>
+                    </mat-list-item>
+
+                    <mat-list-item role="listitem" style="align-items:baseline;">
+                        <div style="height: 35px; width: 20px; background-color: var(--accent-base); margin-right: 10px;"></div>
+                        <div class="mat-headline" style="position: relative; top: 8px;"> Leading Car </div>
+                    </mat-list-item>
+
+                    <mat-list-item role="listitem" style="align-items:baseline;">
+                        <div style="height: 35px; width: 20px; background-color:  var(--green-base); margin-right: 10px;"></div>
+                        <div class="mat-headline" style="position: relative; top: 8px;"> Finished Car </div>
+                    </mat-list-item>
+
+                    <mat-list-item role="listitem" style="align-items:baseline;">
+                        <div style="height: 35px; width: 20px; background-color: grey; margin-right: 10px;"></div>
+                        <div class="mat-headline" style="position: relative; top: 8px;"> Crashed Car </div>
+                    </mat-list-item>
+                </mat-list>               
+            </mat-expansion-panel>
+            
+            <!-- Leading Car Stats -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = true>
+                <mat-expansion-panel-header style="font-size: 30px;" >
+                    <div *ngIf="!carAIService.singlePlayerMode">Leading Car Stats</div> 
+                    <div *ngIf="carAIService.singlePlayerMode">Steerable Car Stats</div> 
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    <table style="font-size: 18px; border-spacing: 5px;">
+                        <tr> <td style="width: 180px;">Velocity </td> <td style="width: 80px;">{{round(carAIService.leaderCar.velocity, 1)}}</td> <td>m/s </td>  </tr>
+                        <tr> <td>Longitudinal Acc. </td> <td>{{round(carAIService.leaderCar.acceleration, 1)}}</td> <td>m/s² </td>  </tr>
+                        <tr> <td>Zentripetal Acc. </td> <td>{{round(carAIService.leaderCar.zentripetalAcceleration, 1)}}</td> <td>m/s² </td>  </tr>
+                        <tr> <td>Max Friction Acc. </td> <td>{{round(carAIService.leaderCar.maxFrictionAcc/9.81, 2)}}</td> <td>g </td>  </tr>
+                        <tr> <td>Optimal Fric. Usage</td> <td>{{round(carAIService.leaderCar.optimalFrictionUsage*100, 1)}}</td> <td>% </td>  </tr>
+                        <tr *ngIf="!carAIService.leaderCar.tractionControlActive"> <td>Traction Control</td> <td style="color: gray;"> Inactive </td> <td> </td>  </tr>
+                        <tr *ngIf="carAIService.leaderCar.tractionControlActive"> <td>Traction Control</td> <td style="color: var(--warn-base);"> Active </td> <td> </td>  </tr>                      
+                        <tr> <td>Throttle </td> <td>{{round(carAIService.leaderCar.throttleInput * 100, 0)}}</td> <td>% </td>   </tr>
+                        <tr> <td>Break </td> <td>{{round(carAIService.leaderCar.brakeInput * 100, 0)}}</td> <td>% </td> </tr>
+                        <tr> <td>Steering Angle</td> <td>{{round(carAIService.leaderCar.deltaV*180/3.141, 1)}}</td>  <td>° </td> </tr>
+                        <tr> <td>Turning Radius</td> <td>{{round(carAIService.leaderCar.turningRadius, 1)}}</td>  <td>m </td> </tr>
+                        <tr> <td>Distance </td> <td>{{round((carAIService.leaderCar.cTI.lapsCompleted + carAIService.leaderCar.cTI.relativePositionOnTrack)*100, 1)}} </td> <td>% </td> </tr>
+                        <tr> <td>Laps completed </td> <td>{{carAIService.leaderCar.cTI.lapsCompleted}}</td>   </tr>
+                        <tr> <td>Fastest Lap </td> <td>{{round(carAIService.leaderCar.cTI.fastestLapTime/1000, 3)}}</td>  <td>s </td> </tr>
+                    </table> 
+                </div>           
+                            
+            </mat-expansion-panel>
+
+            <!-- Fittest Car Stats last gen -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Fittest Car Last Gen.
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    <table style="font-size: 18px; border-spacing: 5px;">
+                        <tr> <td style="width: 180px;">Distance </td> <td style="width: 80px;">{{round((carAIService.theFittestCopy.cTI.lapsCompleted 
+                            + carAIService.theFittestCopy.cTI.relativePositionOnTrack)*100, 1)}} </td> <td style="width: 40px;">% </td> </tr>
+                        <tr> <td>Laps completed </td> <td>{{carAIService.theFittestCopy.cTI.lapsCompleted}}</td>   </tr>
+                        <tr> <td>Fastest Lap </td> <td>{{round(carAIService.theFittestCopy.cTI.fastestLapTime/1000, 3)}}</td>  <td>s </td> </tr>
+                        <tr> <td>Finish Time </td> <td>{{round((carAIService.theFittestCopy.finished ? 
+                            carAIService.theFittestCopy.goneInactiveTimeStamp/1000 : Number.POSITIVE_INFINITY), 3)}}</td>  <td>s </td> </tr>
+                        <tr> <td>Status </td> <td>{{carAIService.theFittestCopy.status()}}</td> </tr>
+                        <tr> <td>Energy Consumption </td> <td>{{round(carAIService.theFittestCopy.energyConsumption/3600000,2)}}</td> kWh </tr>
+                        <tr> <td>Driven Distance </td> <td>{{round(carAIService.theFittestCopy.drivenDistance/1000, 2)}}</td> <td>km </td> </tr>
+                        <tr> <td>Efficiency </td> <td>{{round(carAIService.theFittestCopy.drivenDistance == 0 ? 0 : 
+                            carAIService.theFittestCopy.energyConsumption /(36 * carAIService.theFittestCopy.drivenDistance), 2)}}</td> <td style="font-size: 14px;">kWh/ 100km</td> </tr>
+                        
+                        <tr> <td>Average Optimal Friction Usage</td> <td>{{round(carAIService.theFittestCopy.optimalFrictionUsageSummed * 100000/ 
+                            min([carAIService.theFittestCopy.endTimeofSimulation, carAIService.theFittestCopy.goneInactiveTimeStamp])
+                            , 2)}}</td> <td>% </td> </tr>
+
+                        <tr> <td>Moved Backwards</td> <td>{{carAIService.theFittestCopy.endTimeofSimulation > 0 ? 
+                            round(1000 * carAIService.theFittestCopy.timeMovedBackwards / 
+                            min([carAIService.theFittestCopy.endTimeofSimulation, carAIService.theFittestCopy.goneInactiveTimeStamp]), 2) : 0}}</td> <td> % </td> </tr>  
+
+                        <tr> <td>Traction Control</td> <td>{{carAIService.theFittestCopy.endTimeofSimulation > 0 ? 
+                            round(100000 * carAIService.theFittestCopy.timeTractionControlActive / 
+                            min([carAIService.theFittestCopy.endTimeofSimulation, carAIService.theFittestCopy.goneInactiveTimeStamp]), 2) : 0}}</td> <td> % </td> </tr>  
+
+                        <tr> <td>How Uncomfortable</td> <td>{{carAIService.theFittestCopy.endTimeofSimulation > 0 ? 
+                            round(100000 * carAIService.theFittestCopy.timeandMagnitudeAtUncomfAcceleration / 
+                            (min([carAIService.theFittestCopy.endTimeofSimulation, carAIService.theFittestCopy.goneInactiveTimeStamp]) * 
+                            (carAIService.theFittestCopy.maxFrictionAcc - carAIService.theFittestCopy.stats.uncomfAcceleration)), 2) : 0}}</td> <td> % </td> </tr>    
+
+                        <tr> <td>Average Jerk</td> <td>{{round(carAIService.theFittestCopy.summedJerk * 1000 / 
+                            min([carAIService.theFittestCopy.endTimeofSimulation, carAIService.theFittestCopy.goneInactiveTimeStamp])
+                            , 2)}}</td> <td>m/s³ </td> </tr>
+
+                    </table> 
+                </div>
+            
+            </mat-expansion-panel>
+
+            <!-- Car Stats -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Car Settings
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    <div>Engine Power</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=37 max=746
+                        [(ngModel)]=carAIService.carStats.enginePower> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{round(carAIService.carStats.enginePower * 1.34102, 0)}} HP</label>
+                    </div>
+
+                    
+                    <div>Engine Torque</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=50 max=1000 
+                        [(ngModel)]=carAIService.carStats.engineTorque> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{round(carAIService.carStats.engineTorque, 0)}} Nm</label>
+                    </div>
+
+                    
+                    <div>Tyre Friction Coefficient</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0.1 max=2 step=0.1
+                        [(ngModel)]=carAIService.carStats.tyreFrictionCoefficient> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.tyreFrictionCoefficient}}</label>
+                    </div> 
+
+                    <div>Drag Coefficient</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0.1 max=1.5 step=0.01
+                        [(ngModel)]=carAIService.carStats.dragCoefficient> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.dragCoefficient}}</label>
+                    </div> 
+
+                    <div>Lift Coefficient (Downforce)</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=6 step=0.01
+                        [(ngModel)]=carAIService.carStats.liftCoefficient> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.liftCoefficient}}</label>
+                    </div>   
+                    
+                    <div>Center of Gravity lv/lh</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0.2 max=5 step=0.01
+                        [(ngModel)]=carAIService.carStats.l_v_dividedBy_l_h> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.l_v_dividedBy_l_h}} m/m</label>
+                    </div> 
+
+                    <div>Center of Gravity Height</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=2 step=0.01
+                        [(ngModel)]=carAIService.carStats.centerofGravityHeigth> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.centerofGravityHeigth}} m</label>
+                    </div> 
+
+                    <div>Length</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=2.5 max=5 step=0.1
+                        [(ngModel)]=carAIService.carStats.length> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.length}} m</label>
+                    </div> 
+
+                    <div>Width</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=1 max=2 step=0.1
+                        [(ngModel)]=carAIService.carStats.width> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.width}} m</label>
+                    </div> 
+
+                    <div>Weight</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=300 max=3000 step=10
+                        [(ngModel)]=carAIService.carStats.weight> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.weight}} kg</label>
+                    </div> 
+
+                    <div>Maximum Steering Angle</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=5 max=45 step=1
+                        [(ngModel)]=carAIService.carStats.MaxsteeringAngle> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.MaxsteeringAngle}} °</label>
+                    </div> 
+                    
+                    </div>
+            
+            </mat-expansion-panel>
+
+            <!-- Dist Sensors -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Distance Sensors
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    <div>
+                        <mat-slide-toggle color = "primary"  [(ngModel)] = "carAIService.showSensorsonLeader" 
+                        [disabled] = "!carAIService.aICarConstructionPlan.giveSensors"
+                        (change) = "carAIService.updateSensors()"style=" margin: 10px; margin-bottom: 25px;">
+                            Show Sensors on Leader
+                        </mat-slide-toggle>
+                    </div>
+
+                    <div>
+                        <mat-slide-toggle color = "primary"  [(ngModel)] = "carAIService.showSensors" 
+                        [disabled] = "!carAIService.aICarConstructionPlan.giveSensors"
+                        (change) = "carAIService.updateSensors()" style=" margin: 10px; margin-bottom: 25px;">
+                            Show Sensors on All
+                        </mat-slide-toggle>
+                    </div>
+
+                    <div>Set Sensor View Distance</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 5px; padding-top: 0;" 
+                        color = "primary" min=10 max=150 
+                        [(ngModel)]="carAIService.sensorMaxMeasureDistance"
+                        (change) = "carAIService.updateSensors()"
+                        > </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.sensorMaxMeasureDistance}}m</label>
+                    </div>           
+
+                    <div style="flex: 1 1 200px; display: flex; flex-flow: column;">    
+                        <mat-form-field appearance="fill" style="position: relative ; top: 12px; overflow:hidden; flex: 1 1 auto;" >
+                            <mat-label>Sensors</mat-label>
+                            <mat-select  [(ngModel)] = "selectedSensor"  
+                            (selectionChange) = drawCarWithSensors()   >
+                            <mat-option *ngFor="let sensorConstructionPlan of carAIService.aICarConstructionPlan.distSensors; index as i" [value]="sensorConstructionPlan">
+                                <div> 
+                                <b>Sensor ({{i}})</b> [Pos: {{sensorPositiontoInt(sensorConstructionPlan.relPositionCarFrameCode)}}, Ang: {{toDeg(sensorConstructionPlan.relativeAngle)}}°] 
+                                </div>
+                            </mat-option>
+                    
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="carAIService.sensorsModded" style="margin-bottom: 20px; margin-top: 10px; color: var(--warn-base);" >
+                        <span *ngIf="carAIService.evolutionLoopRunning"> Pause and </span>
+                        <span> Reset to Apply Sensors </span>
+                    </div>
+
+                    <div *ngIf="!carAIService.sensorsModded" style="margin-bottom: 20px; margin-top: 10px; color: var(--primary-base);"> Distance Sensors are up to Date </div>
+
+                    <div>
+                        <button 
+                        class="mat-headline" mat-raised-button 
+                        (click) = "deleteSelectedSensor()" 
+                        style="position: relative; background-color: var(--dark-red-base); color: white; font-size: 20px; height: 40px; width: 100%; flex: 1 1 auto; margin-bottom: 15px;">
+                        Delete Selected Sensor
+                        </button>
+                    </div>
+
+                    
+                    <div>Position on Frame</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=15 
+                        [(ngModel)]=curInputPosition
+                        (change) = "onSensorSettingChange()"
+                        > </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{curInputPosition}}</label>
+                    </div>
+
+                    <div>Relative Angle</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=-180 max=180 step=5
+                        [(ngModel)]=curInputAngle
+                        (change) = "onSensorSettingChange()"
+                        > </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{curInputAngle}}°</label>
+                    </div>
+
+                    <div>
+                        <button 
+                        class="mat-headline" mat-raised-button 
+                        (click) = "addSensor()" 
+                        style="position: relative; background-color:var(--green-base); color: white; width: 100%;  font-size: 20px; height: 40px;  flex: 1 1 auto; margin-bottom: 15px;">
+                        Add Current Sensor
+                        </button>
+                    </div>
+                    <div>
+                        <button 
+                            class="mat-headline" mat-raised-button 
+                            (click) = "overwriteSelectedSensor()" 
+                            style="position: relative; background-color:var(--dark-red-base); color: white; font-size: 20px; height: 40px; width: 100%; flex: 1 1 auto; margin-bottom: 15px;">
+                            Overwrite Selected Sensor
+                        </button>
+                    </div>
+
+                    <canvas #showSensorSettingCanvas style="width: 300px; height: 200px; border: 1px solid black;">
+                    </canvas>
+                </div>
+            
+            </mat-expansion-panel>
+
+            <!-- Neural Network -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Neural Network
+                </mat-expansion-panel-header>
+
+                <div style="font-size: 20px; display:flex; flex-direction: column;">
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.giveSensors" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px;"> Sensors as Input </mat-slide-toggle>
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.givePosition" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px;"> Relative Position as Input </mat-slide-toggle>
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.giveVelocity" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px;"> Velocity as Input </mat-slide-toggle>
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.giveAcceleration" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px;"> Acceleration as Input </mat-slide-toggle>
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.giveZentripetalAcceleration" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px;"> Zentripetal Acc. as Input </mat-slide-toggle>
+
+                    <mat-slide-toggle color = "primary"
+                    [(ngModel)] = "carAIService.copiedAICarConstructionPlan.mergeThrottleandBreak" 
+                    (change) = onAnyNeuralNetworkChange()         
+                    style="margin: 10px; margin-bottom: 25px; font-size: 18px;"> Merge Throttle and Break Output </mat-slide-toggle>
+
+                    <mat-form-field appearance="fill" style=" width: 100%;" >
+                        <mat-label>Activation Function</mat-label>
+                        <mat-select  
+                            [(ngModel)] = "carAIService.copiedAICarConstructionPlan.networkPlan.activationFunctionId"
+                            (selectionChange) = onAnyNeuralNetworkChange()
+                        >
+                        <mat-option *ngFor="let actfuncID of carAIService.activationFunctionIDs" [value]="actfuncID.id">
+                            <div> 
+                            {{actfuncID.viewvalue}} 
+                            </div>
+                        </mat-option>               
+                        </mat-select>
+                    </mat-form-field> 
+
+                    <div *ngIf="carAIService.neuralNetworkModded" style="margin-bottom: 15px; color: var(--warn-base);" >
+                        <span *ngIf="carAIService.evolutionLoopRunning"> Pause and </span>
+                        <span> Reset to Load Network </span>
+                    </div>
+
+                    <div *ngIf="!carAIService.neuralNetworkModded" style="margin-bottom: 15px; color: var(--primary-base);"> Neural Network is up to Date </div>
+                              
+
+                    <div>Input Layer: {{carAIService.copiedAICarConstructionPlan.networkPlan.inputs}} Neurons</div>
+
+                    <mat-divider style="margin-top: 20px; margin-bottom: 20px; "></mat-divider>
+
+                    <div style="margin-bottom: 20px; ">Hidden Layers: {{carAIService.copiedAICarConstructionPlan.networkPlan.hiddenLayerSizes.length}} </div>
+
+                    <div style="display: flex; flex-direction: row;">
+                        <button 
+                        class="mat-headline" mat-raised-button 
+                        (click) = "addHiddenLayer()" 
+                        style="position: relative; background-color:var(--primary-base); color: white;  font-size: 20px; height: 40px;  flex: 1 1 auto; margin-bottom: 15px;">
+                        Add Layer
+                        </button>
+
+                        <span style="flex: 0 0 5px;"></span>
+                        
+                        <button 
+                        class="mat-headline" mat-raised-button 
+                        (click) = "removeHiddenLayer()" 
+                        style="position: relative; background-color:var(--warn-base); color: white; font-size: 20px; height: 40px;  flex: 1 1 auto; margin-bottom: 15px;">
+                        Remove Layer
+                        </button>
+                        
+                    </div>
+
+                    <div *ngFor="let neurons of copiedHiddenLayerList; index as i">
+                        <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                            <label style="position:relative; bottom:5px ; margin-right: 5px;">{{i+1}}:</label>
+                            <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                            color = "primary" min=1 max=100
+                            (change) = changeHiddenLayerNeuronNumber(i,$event)
+                            [value] = neurons
+                            > </mat-slider>
+                            <label style="position:relative; bottom:5px ;">{{carAIService.copiedAICarConstructionPlan.networkPlan.hiddenLayerSizes[i]}} Neurons</label>
+                        </div>
+                    </div>
+
+                    <mat-divider style="margin-bottom: 20px; "></mat-divider>
+
+                    <div>Output Layer: {{carAIService.copiedAICarConstructionPlan.networkPlan.outputs}} Neurons</div>
+
+                </div>
+
+            
+            </mat-expansion-panel>
+
+            <!-- Fitness Function -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Fitness Function
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    <div>Reward Track Completion</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.trackCompletionFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.trackCompletionFactor)}}%</label>
+                    </div>
+
+                    
+                    <div>Reward Track Completion Per Time</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.trackpertime> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.trackpertime)}}%</label>
+                    </div>
+
+                    
+                    <div>Reward Using Maximum Traction</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.optimalFrictionFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.optimalFrictionFactor)}}%</label>
+                    </div> 
+                    
+                    
+                    <div>Punish Using Traction Control</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.tractionControlFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.tractionControlFactor)}}%</label>
+                    </div>
+                        
+
+                    <div>Punish Energy Usage</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "warn" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.energyConsumptionFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.energyConsumptionFactor)}}%</label>
+                    </div>
+        
+
+                    <div>Punish Jerk</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "warn" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.jerkFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.jerkFactor)}}%</label>
+                    </div>
+
+
+                    <div>Punish Collision (reduces all)</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "warn" min=0 max=1 step=0.01
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.collisionPunishmentFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">x{{round(1 - carAIService.fitnessFunctionInfo.collisionPunishmentFactor, 2)}}</label>
+                    </div>
+
+
+                    <div>Punish Uncomfortable Driving</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "warn" min=0 max=100 
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.uncomfAccelerationFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{calculateFractionFitnessFactors(carAIService.fitnessFunctionInfo.uncomfAccelerationFactor)}}%</label>
+                    </div>
+
+
+                    <div>Uncomfortable Acceleration</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "primary" min=1 max=10 step=0.1
+                        [(ngModel)]=carAIService.carStats.uncomfAcceleration> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">{{carAIService.carStats.uncomfAcceleration}} m/s²</label>
+                    </div> 
+
+
+                    </div>
+            
+            </mat-expansion-panel>
+
+            <!-- Genetic Algorithm -->
+
+            <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;" expanded = false>
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    Genetic Algorithm
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                                        
+                <div>Elitism Fraction</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.elitismFraction> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.elitismFraction, 0)}}%</label>
+                </div>
+
+                <div>Random Fraction</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.randomFraction> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.randomFraction, 0)}}%</label>
+                </div>
+
+                
+                <!-- Selection Algorithm -->
+
+                <mat-form-field appearance="fill" style="flex: 1 1 auto; width: 100%;" >
+                    <mat-label>Selection Function</mat-label>
+                    <mat-select  [(ngModel)] = "carAIService.breedingInfo.selectionFunctionID">
+                    <mat-option *ngFor="let selfuncID of carAIService.selectionFunctionIDs" [value]="selfuncID.id">
+                        <div> 
+                        {{selfuncID.viewvalue}} 
+                        </div>
+                    </mat-option>
+            
+                    </mat-select>
+                </mat-form-field> 
+
+
+                <div >Tournament Selection: Rounds</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=1 max=200 step=1
+                    [disabled] = "carAIService.breedingInfo.selectionFunctionID != 'tournamentSelection'"
+                    [(ngModel)]=carAIService.breedingInfo.tournamentSelectionDepth> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{carAIService.breedingInfo.tournamentSelectionDepth}}</label>
+                </div>
+
+                <div >Top x Percent Selection</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=1 max=100 step=1
+                    [disabled] = "carAIService.breedingInfo.selectionFunctionID != 'topXPercentSelecetion'"
+                    [(ngModel)]=carAIService.breedingInfo.selectionTopXPercent> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{carAIService.breedingInfo.selectionTopXPercent}}%</label>
+                </div>
+
+                <div>Crossover Rate</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.crossoverRate> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.crossoverRate, 0)}}%</label>
+                </div>
+                
+                <div>Crossover Genotype Slices</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=1 max=19 step=2
+                    [(ngModel)]=carAIService.breedingInfo.crossoverPoints> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{carAIService.breedingInfo.crossoverPoints}}</label>
+                </div>
+
+                <div>Mutation Rate</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.mutationRate> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.mutationRate, 0)}}%</label>
+                </div>
+
+                <div>Mutation Rate Per Gene Biases</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.mutationRateperGeneBiases> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.mutationRateperGeneBiases, 0)}}%</label>
+                </div>
+
+                <div>Mutation Rate Per Gene Weights</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=1 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.mutationRateperGeneWeights> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(100*carAIService.breedingInfo.mutationRateperGeneWeights, 0)}}%</label>
+                </div>
+
+                <div>Mutation Magnitude Biases</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=0.5 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.mutationMagnitudeBiases> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(carAIService.breedingInfo.mutationMagnitudeBiases, 2)}}</label>
+                </div>
+
+                <div>Mutation Magnitude Weights</div>
+                <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                    <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                    color = "primary" min=0 max=0.5 step=0.01
+                    [(ngModel)]=carAIService.breedingInfo.mutationMagnitudeWeights> </mat-slider>
+                    <label style="position:relative; bottom:5px ;">{{round(carAIService.breedingInfo.mutationMagnitudeWeights, 2)}}</label>
+                </div>
+
+                </div>
+            
+            </mat-expansion-panel>
+
+
+            
+            <!-- <mat-expansion-panel style="margin-bottom: 20px; padding: 5px;">
+                <mat-expansion-panel-header style="font-size: 30px;">
+                    
+                </mat-expansion-panel-header>
+                <div style="font-size: 20px;">
+                    
+                </div>
+            
+            </mat-expansion-panel> -->
+
+        </mat-drawer>
+
+        <mat-drawer-content style="flex: 1 0 800px;display: flex;flex-flow: column;width: 100%;height: 100%;">      
+            <app-car-ai-toolbar style="flex: 0 1 auto;"></app-car-ai-toolbar>
+            <app-car-ai-canvas style="  flex: 0 1 auto; display: flex;"> </app-car-ai-canvas>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</body>

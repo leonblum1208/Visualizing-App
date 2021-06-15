@@ -1,0 +1,22 @@
+
+<mat-toolbar id="main-nav-bar" color = "primary" 
+style="
+padding: 12px; 
+height: fit-content; 
+display: flex; 
+flex-wrap: nowrap; 
+justify-content: space-between;
+">
+
+    <button style="flex: 0 0 auto;" mat-button routerLink="/home">  
+            <span class="mat-display-1" >Algorithm Visualizer</span>  
+            <span class="mat-headline" style="position: relative; top: 1px"> {{currentUrl}} </span>
+    </button>
+    
+
+    <button style="flex: 0 0 auto;" mat-button routerLink="/about">
+        <mat-icon style="margin-right: 3mm;">person</mat-icon>
+        <span class="mat-title">About</span>
+    </button>
+
+</mat-toolbar>

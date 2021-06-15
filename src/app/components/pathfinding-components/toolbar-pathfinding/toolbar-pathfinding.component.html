@@ -1,0 +1,222 @@
+<mat-toolbar id="pathfinding-toolbar" style="height: 100%; flex-wrap: nowrap;">
+
+
+    <button mat-fab (click) = "pathservice.pathFindingSideNavOpened = !pathservice.pathFindingSideNavOpened" color= "primary"
+    *ngIf = "!pathservice.pathFindingSideNavOpened; else closeSidebarArrow">
+      <mat-icon >menu</mat-icon>
+    </button>
+
+    <ng-template #closeSidebarArrow>
+      <button mat-fab (click) = "pathservice.pathFindingSideNavOpened = !pathservice.pathFindingSideNavOpened" color= "primary" >
+        <mat-icon style="font-size: 40px; position: relative; bottom: 9px; right: 8px">
+          keyboard_backspace
+      </mat-icon> 
+      </button>
+    </ng-template>
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+    <!-- Quick Start Help Buttons -->
+    <button mat-fab  color= "accent" (click) = "pathservice.quickStartInfo = !pathservice.quickStartInfo" 
+    *ngIf = "!pathservice.quickStartInfo; else closeQuickStart">
+      <div style="font-size: 40px;">?</div>
+    </button>
+
+    <ng-template #closeQuickStart>
+      <button mat-fab (click) = "pathservice.quickStartInfo = !pathservice.quickStartInfo"  style="align-items: baseline;" color="warn">
+        <mat-icon style="font-size: 40px; position: relative; bottom: 9px; right: 8px">close</mat-icon>
+      </button>
+    </ng-template>
+
+
+    <!-- Quick Start Help -->
+
+    <mat-card style=" position: absolute; top: 120px; background-color: rgb(245, 245, 245); height: 740px; overflow-y: scroll;"  *ngIf = "pathservice.quickStartInfo" >    
+      <mat-card-header>
+        <mat-card-title style="font-size: 36px; margin-bottom: 20px;"> Help </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content style="display: flex; flex-flow: column;">
+
+        <mat-card>    
+          <mat-card-header>
+            <mat-card-title> Toolbar </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p><b>Algorithm Menu:</b> Choose the algorithm you want to visualize. Default is Dijkstra's.</p>
+            <p><b>Allow Animations:</b> Toggle the animation, that shows in which order the nodes get visited.</p>
+            <p><b>Allow Diagonals:</b> Allows the algorithm to traverse the grid diagonally, not only horizontally and vertically.
+              <br> Instaed of only having 4 direct neighbors with a distance of 1, each node has 4 extra nodes it can reach directly with a distance of sqrt(2).</p>
+            <p><b>Speed Slider </b>  <mat-icon style="position: relative; top:6px"> speed </mat-icon>: Changes the speed of the Animation at any time.</p>            
+            <p><b>Grid Slider </b>  <mat-icon style="position: relative; top:6px"> apps </mat-icon>: Sets the number of nodes per column.</p>
+            <p><b>Clear:</b> Clears all visited nodes and those in a path and sets them to unvisited nodes. Walls remain in tact.</p>
+            <p><b>Visualize:</b> Press to start the Algorithm and show the results on the grid.</p>
+            <p><b>Reset:</b> Resets all nodes and the Start and End position. Walls are destroyed.</p>
+          </mat-card-content>
+        </mat-card>
+
+        <span style="flex: 0 0 20px;"></span>
+
+        <mat-card>    
+          <mat-card-header>
+            <mat-card-title> The Grid </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>The grid consists of cells (here called nodes) that can have seven different states. A legend can be found in the <b>sidebar</b>.</p>
+            <p>The <b>Start-</b> and <b>End-node</b> can be moved via Drag and Drop.</p>
+            <p>You can draw or remove <b>Walls</b> by holding the left-mouse-button down and moving it over any node. 
+              <br> The same is achieved by clicking on a node.</p>
+            <p>You can draw or remove walls and move the Start- and End-node even when the results are displayed. This will automatically update the grid.</p>
+            <p>You can change the <b>number</b> of <b>Grid-Nodes</b> per column by using the <mat-icon style="position: relative; top:5px">apps</mat-icon>-Slider. Care, this resets the board!</p>
+          </mat-card-content>
+     
+        </mat-card>
+
+        <span style="flex: 0 0 20px;"></span>
+
+        <mat-card>    
+          <mat-card-header>
+            <mat-card-title> Sidebar </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>            
+            <p> You can open the sidebar using the <mat-icon style="position: relative; top:7px">menu</mat-icon> button. </p>
+            <p>In the sidebar you can find the A* heuristic settings, statistics for your current visualization and the a node color legend. </p>
+            <p> If there is a <b> shorter path</b>, with regard to the one that is currently being displayed, it can be shown using the button in the statistics tab. </p>
+          </mat-card-content>
+        </mat-card>
+
+      </mat-card-content>
+ 
+    </mat-card>
+
+
+
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+    <!-- Algorithm Chooser -->
+    <mat-form-field appearance="fill" style="flex: 3 0 150px; position: relative ; top: 12px; overflow:hidden;" >
+      <mat-label >Algorithm</mat-label>
+      <mat-select (selectionChange) = "pathservice.updateVisited()" [(ngModel)] = "pathservice.selectedAlgorithm" [disabled] = pathservice.currentlyAnmiating 
+      >
+        <mat-option *ngFor="let algorithm of pathservice.algorithms" [value]="algorithm">
+          <div *ngIf = "algorithm.id === 'a*'; else shownoheuristic"> 
+            {{algorithm.viewValue}} ({{pathservice.selectedHeuristic.viewValue}} &epsilon;={{pathservice.heuristicWeight}}) 
+          </div>
+          <ng-template #shownoheuristic>
+            {{algorithm.viewValue}} 
+          </ng-template>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <span style="flex: 0 0 5px;"></span>
+
+    <!-- Info Button -->
+    <button mat-icon-button (click) = "pathservice.algoInfoShown = !pathservice.algoInfoShown" 
+    *ngIf = "!pathservice.algoInfoShown; else closeAlgoInfo" >
+      <mat-icon >info</mat-icon>
+    </button>
+
+    <ng-template #closeAlgoInfo>
+      <button mat-mini-fab (click) = "pathservice.algoInfoShown = !pathservice.algoInfoShown" style="align-items: baseline;" color="warn">
+        <mat-icon >close</mat-icon>
+      </button>
+    </ng-template>
+
+    
+    <!-- Pop-Up -->
+    <mat-card style="position: absolute; top: 120px; display: flex; flex-flow: column;"  
+    *ngIf = "pathservice.algoInfoShown" >    
+      <iframe #algoWiki src="https://en.wikipedia.org/wiki/Pathfinding#Algorithms" 
+      frameborder="0" width= "1360px" height="740px">
+      </iframe>
+    </mat-card>
+    
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+
+    <!-- Switches -->
+    <div style="display: flex; flex-flow: column;">
+
+      <mat-slide-toggle color = "primary"  [(ngModel)] = "pathservice.allowAnimation" style="flex: 1 1 auto">
+        Animation
+      </mat-slide-toggle>
+
+      <span style="flex: 1 0 20px;"></span>
+    
+      <mat-slide-toggle color = "primary" [(ngModel)] = "pathservice.allowDiagonal" (change) = "pathservice.updateVisited()" 
+      [disabled] = pathservice.currentlyAnmiating style="flex: 1 1 auto">Diagonals
+      </mat-slide-toggle>
+      
+    </div>
+    
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+    <!-- Sliders -->
+    <div style="flex: 2 1 200px; display: flex; flex-flow: column;">
+
+      <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" color = "primary" min=1 max=9 [(ngModel)]="pathservice.speedValue"></mat-slider>
+        <mat-icon style="margin: 5px;">speed</mat-icon>
+        <label>{{"  "+pathservice.speedValue}}</label>
+      </div>
+
+
+      <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center;">
+        <mat-slider style="flex: 1 1 auto;" (change)="pathservice.resizeGrid()" color = "primary" min=10 max=100 
+        [(ngModel)]="pathservice.numOfCols" [disabled] = pathservice.currentlyAnmiating>
+        </mat-slider>
+        <mat-icon style="margin: 5px;">apps</mat-icon>
+        <label>{{"  "+ pathservice.numOfCols}}</label>
+      </div>
+
+    </div>
+
+    <span style="flex: 1 0 5px;"></span>
+
+
+    <button mat-raised-button color="primary" (click) = "pathservice.resetVisitedNodes()" 
+    [disabled] = pathservice.currentlyAnmiating style="flex: 0 0 auto;">
+      <div style="position: relative; top: 8px; flex: 0 0 auto;" class="mat-headline" >Clear</div>    
+    </button>
+
+
+    <span style="flex: 1 0 5px;"></span>
+
+
+    <button *ngIf="!pathservice.currentlyAnmiating; else STOPBUTTON" 
+    class="mat-headline" mat-raised-button color="accent" 
+    (click) = "pathservice.visualizeAlgorithm()" 
+    style="position: relative;  font-size: 36px; height: 60px; width: 180px; flex: 0 0 auto;">
+    Visualize
+    </button>
+
+    <ng-template #STOPBUTTON>
+    <button  class="mat-headline" mat-raised-button color="warn" (click) = "pathservice.stopVisualization()" 
+      style="position: relative;  font-size: 36px; height: 60px; width: 180px; flex: 0 0 auto;">
+    STOP!
+    </button>
+    </ng-template>
+
+
+    <span style="flex: 2 0 5px;"></span> 
+    
+
+    <button mat-raised-button color="warn" (click) = "pathservice.resetNodes()" 
+    [disabled] = pathservice.currentlyAnmiating style="flex: 0 0 auto;">
+      <div style="position: relative; top: 8px; flex: 0 0 auto;" class="mat-headline" >Reset</div>    
+    </button>
+    
+    <span style="flex: 0 0 10px;"></span> 
+
+
+</mat-toolbar>
+
+

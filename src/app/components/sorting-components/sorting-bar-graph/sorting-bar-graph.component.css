@@ -1,0 +1,51 @@
+/* 
+    --primary-base: #3f51b5;
+    --accent-base: #ff4081;
+    --warn-base: #F44336;
+    --yellow-base: rgb(255, 208, 0);
+    --dark-red-base: rgb(190, 0, 0);
+    --green-base: rgb(157, 238, 35);  */
+
+   
+
+.bars-wrapper {
+    padding: 3%;
+    display:flex ;
+    align-items: flex-end;
+    flex-flow:row;
+    height: 100%;
+    width: 94%;
+}
+
+.bars-wrapper div {
+    flex:1 1 auto;
+    border-right: 1px solid white;
+    display: flex; 
+    justify-content: center;
+}
+
+.bars-wrapper div label{
+    width: 0px;
+    flex: 1 1 auto;
+    color: white;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+.inactive{
+    background-color:  var(--primary-base);
+}
+
+.compare{
+    background-color:  var(--accent-base);
+}
+        
+.overwrite{
+    background-color:  var(--yellow-base);
+}
+
+.swap{
+    background-color:  var(--green-base);
+}
+
+

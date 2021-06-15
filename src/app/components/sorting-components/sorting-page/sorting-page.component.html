@@ -1,0 +1,171 @@
+<body style="       
+    display: flex;
+    flex-flow: column;
+    width: 100%;">
+
+    <app-main-nav-bar style="flex: 0 1 auto;"></app-main-nav-bar>
+
+    <mat-drawer-container style="
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    "   hasBackdrop="false">
+
+        <mat-drawer mode="side" [(opened)]="sortservice.sortingSideNavOpened"
+        style="
+        flex: 1 1 auto;
+        width: fit-content;
+        padding: 15px;
+        background-color: rgb(235, 235, 235);
+        ">  
+
+            
+            <mat-card style="margin-bottom: 15px;">
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px;"> Bar Color Legend</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-list role="list">
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 15px; background-color: var(--primary-base); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Inactive </div>
+                        </mat-list-item>
+
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 15px; background-color: var(--accent-base); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Compare </div>
+                        </mat-list-item>
+
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 15px; background-color:  var(--green-base); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Swap </div>
+                        </mat-list-item>
+
+                        <mat-list-item role="listitem" style="align-items:baseline;">
+                            <div style="height: 35px; width: 15px; background-color: var(--yellow-base); margin-right: 10px;"></div>
+                            <div class="mat-headline" style="position: relative; top: 8px;"> Overwrite </div>
+                        </mat-list-item>
+                    </mat-list>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card style="margin-bottom: 15px; display: flex; flex-flow: column;">
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px; "> Statistics</mat-card-title>
+                </mat-card-header>  
+                <mat-card-content>
+                    <table style="font-size: 18px; border-spacing: 5px;">
+                        <tr> <td> <b>{{sortservice.selectedAlgorithm.viewValue}} </b></td>   </tr>
+                        <tr> <td>Numbers </td> <td>{{sortservice.arrayLength}}</td>   </tr>
+                        <tr> <td>Comparisons </td> <td >{{sortalgorithmservice.comparisonsDone}}</td>  </tr>
+                        <tr> <td>Comp. per Number </td> <td >{{(sortalgorithmservice.comparisonsDonePerNumber)}}</td>  </tr>
+                        <tr> <td>Swaps</td> <td>{{sortalgorithmservice.swapsDone}}</td>  </tr>
+                        <tr> <td>Swaps per Number</td> <td >{{sortalgorithmservice.swapsDonePerNumber}}</td>  </tr>
+                        <tr> <td>Overwrites </td> <td>{{sortalgorithmservice.overwritesDone}}</td>  </tr>
+                        <tr> <td>Overwrites per Number&nbsp;&nbsp;</td> <td>{{sortalgorithmservice.overwritesDonePerNumber}}</td>  </tr>
+
+                    </table> 
+                </mat-card-content>                    
+            </mat-card>  
+
+
+            <mat-card style="margin-bottom: 15px; display: flex; flex-flow: column;">
+                
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px; "> Algorithm Settings</mat-card-title>
+                </mat-card-header>           
+
+                <mat-card-content style="display: flex; flex-flow: column;">
+
+                    <span style="flex: 0 0 15px;"></span>
+
+                    <label style="font-size: 18px; ">{{" Radix Sort Base: "+sortalgorithmservice.radixBase +" "}} </label>
+                    <mat-slider style="flex: 1 1 auto;" color = "primary" min=2 max=128 [disabled] = sortservice.currentlyAutoPlaying
+                    [(ngModel)]="sortalgorithmservice.radixBase" (change) = "sortservice.updateState()"></mat-slider>
+
+                    <span style="flex: 0 0 15px;"></span>
+
+                    <label style="font-size: 18px; ">{{"Tim Sort Min Run Bound: "+sortalgorithmservice.minRunBase +" "}} </label>
+                    <mat-slider style="flex: 1 1 auto;" color = "primary" min=1 max=8 [disabled] = sortservice.currentlyAutoPlaying
+                    [(ngModel)]="sortalgorithmservice.minRunBaseExponent" (change) = "sortalgorithmservice.setMinRunBase();  sortservice.updateState()"></mat-slider>
+
+                    <label style="font-size: 18px; ">{{"Tim Sort Min Gallop: "+sortalgorithmservice.minGallop +" "}} </label>
+                    <mat-slider style="flex: 1 1 auto;" color = "primary" min=2 max=16 [disabled] = sortservice.currentlyAutoPlaying
+                    [(ngModel)]="sortalgorithmservice.minGallop" (change) = "sortservice.updateState()"></mat-slider>
+                    
+                                                                                     
+                </mat-card-content>
+                
+            </mat-card>     
+
+            <mat-card style="margin-bottom: 15px; display: flex; flex-flow: column;">
+                
+                <mat-card-header>
+                    <mat-card-title style="font-size: 30px; "> Number Settings</mat-card-title>
+                </mat-card-header>           
+
+                <mat-card-content style="display: flex; flex-flow: column;">
+
+                    <span style="flex: 0 0 15px;"></span>
+
+                    <mat-slide-toggle color = "primary"  [(ngModel)] = "sortservice.showNumbers" 
+                    
+                    style="flex: 1 1 auto; font-size: 20px;">
+                        Show Numbers
+                    </mat-slide-toggle>
+ 
+                    <span style="flex: 0 0 15px;"></span>
+
+                    <mat-form-field style="flex: 1 1 auto; font-size: 24px;">
+                        <mat-label>Minimum Number</mat-label>
+                        <input matInput type="number" 
+                        [disabled] = sortservice.currentlyAutoPlaying
+                        [(ngModel)]="sortservice.generateAtLeast"
+                        (change) = "sortservice.checkInputs()"
+                        >
+                        <mat-hint style="font-size: 14px;">Min: -1'000'000, Max: 1'000'000</mat-hint>
+                    </mat-form-field>
+
+                    <span style="flex: 0 0 15px;"></span>
+                  
+                    <mat-form-field style="flex: 1 1 auto; font-size: 24px;">
+                        <mat-label>Number Range</mat-label>
+                        <input matInput type="number" 
+                        [disabled] = sortservice.currentlyAutoPlaying
+                        [(ngModel)]="sortservice.numberRange"
+                        (change) = "sortservice.checkInputs()"
+                        >
+                        <mat-hint style="font-size: 14px;">Min: 1, Max: 1'000'000</mat-hint>
+                    </mat-form-field>
+                                                                                     
+                </mat-card-content>
+                
+            </mat-card>          
+
+        </mat-drawer>
+
+        <mat-drawer-content style="
+        flex: 1 0 800px;
+        display: flex;
+        flex-flow: column;
+        width: 100%;
+        ">
+
+        
+            <app-sorting-toolbar style="flex: 0 1 auto;"></app-sorting-toolbar>
+
+            <app-sorting-bar-graph style="  
+            display: flex;
+            flex-flow: column;
+            flex: 1 1 auto;
+            width: 100%;
+            "> </app-sorting-bar-graph>
+    
+
+        </mat-drawer-content>
+
+    </mat-drawer-container>
+
+
+</body>

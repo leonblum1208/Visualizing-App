@@ -1,0 +1,13 @@
+<table class = grid>
+    <tr *ngFor="let row of nodes">     
+        <td 
+        (mouseenter)    =   "onMouseEnter($event.buttons, node)" 
+        (mousedown)     =   "onMouseDown($event.buttons, node)"
+        (mouseup)       =   "onMouseUp(node)"
+        unselectable= "on"
+        id = {{node.id}} 
+        class = {{node.type}} 
+        *ngFor ="let node of row">   
+        </td>        
+    </tr>
+</table>

@@ -1,0 +1,35 @@
+.gridPortfolioContainer{
+    flex: 1 1 auto;
+    display: grid; 
+    padding: 3%;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 0.5fr;
+
+}
+
+.gridPortfolioItem{
+    cursor:pointer;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.gridPortfolioLabel{
+    width: 100%;
+    height: 100%;
+    font-size: 3vw;   
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color:transparent;
+    transition: background-color 750ms ease, color 750ms ease;
+}
+
+.gridPortfolioLabel:hover{
+    color: white;  
+    background-color: rgba(0, 0, 0, 0.85);
+    transition: background-color 750ms ease, color 750ms ease;
+}
+

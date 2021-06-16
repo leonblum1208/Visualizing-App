@@ -5,18 +5,30 @@ padding: 12px;
 height: fit-content; 
 display: flex; 
 flex-wrap: nowrap; 
-justify-content: space-between;
 ">
 
+
     <button style="flex: 0 0 auto;" mat-button routerLink="/home">  
+            <mat-icon style="margin-right: 10px; font-size: 32px; position: relative; bottom: 4px; right: 10px;">home</mat-icon>
             <span class="mat-display-1" >Algorithm Visualizer</span>  
             <span class="mat-headline" style="position: relative; top: 1px"> {{currentUrl}} </span>
     </button>
-    
 
-    <button style="flex: 0 0 auto;" mat-button routerLink="/about">
+    <span style="flex: 1 1 auto;"></span>
+
+
+
+    <a mat-button href="https://www.linkedin.com/in/leon-blum-aa7b5920b/" target="_blank" rel="noreferrer noopener" >
+        <img  src="assets/data/images/linkedin-24.png" >
+    </a>
+
+    <span style="font-size: 30px;">|</span>
+    
+    <button mat-button routerLink="/about">
         <mat-icon style="margin-right: 3mm;">person</mat-icon>
-        <span class="mat-title">About</span>
+        <span class="mat-title" style="font-size: 24px;">About</span>
     </button>
+
+
 
 </mat-toolbar>

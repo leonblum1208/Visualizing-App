@@ -502,15 +502,6 @@
                     </div>
 
 
-                    <div>Punish Collision (reduces all)</div>
-                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
-                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
-                        color = "warn" min=0 max=1 step=0.01
-                        [(ngModel)]=carAIService.fitnessFunctionInfo.collisionPunishmentFactor> </mat-slider>
-                        <label style="position:relative; bottom:5px ;">x{{round(1 - carAIService.fitnessFunctionInfo.collisionPunishmentFactor, 2)}}</label>
-                    </div>
-
-
                     <div>Punish Uncomfortable Driving</div>
                     <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
                         <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
@@ -527,6 +518,15 @@
                         [(ngModel)]=carAIService.carStats.uncomfAcceleration> </mat-slider>
                         <label style="position:relative; bottom:5px ;">{{carAIService.carStats.uncomfAcceleration}} m/s²</label>
                     </div> 
+
+
+                    <div>Punish Collision (reduces all)</div>
+                    <div style="width:100%; flex: 1 1 auto; display: flex; flex-flow: row; align-items: center; ">
+                        <mat-slider style="flex: 1 1 auto; margin-right: 10px; margin-bottom: 10px; padding-top: 0;" 
+                        color = "warn" min=0 max=1 step=0.01
+                        [(ngModel)]=carAIService.fitnessFunctionInfo.collisionPunishmentFactor> </mat-slider>
+                        <label style="position:relative; bottom:5px ;">x{{round(1 - carAIService.fitnessFunctionInfo.collisionPunishmentFactor, 2)}}</label>
+                    </div>
 
 
                     </div>

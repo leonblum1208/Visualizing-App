@@ -1,30 +1,39 @@
 <body style="       
     display: flex;
     flex-flow: column;
-    width: 100%;">  
+    width: 100%;
+    ">  
 
-    <app-main-nav-bar style="flex: 0 1 auto;"></app-main-nav-bar>
-
-    <div style="padding-left: 20%; padding-right:20%; font-size:x-large;">
+    <app-main-nav-bar style="width: 100%; overflow: visible;"></app-main-nav-bar>
 
 
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+    <div style="
+    font-size:x-large; 
+    max-width: 1200px; min-width: 950px; 
+    display: flex; flex-direction: column;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    ">
+
+        <mat-divider style="margin-top: 50px; margin-bottom: 15px; overflow: visible;"></mat-divider>
 
         <h1 style="display:flex ; justify-content: center;">
-           Goal of this Algorithm Visualization
+            Goal of this Algorithm Visualization
         </h1>
     
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 15px; margin-bottom: 50px;"></mat-divider>
 
         <div style="display: flex; flex-flow: row; height: fit-content;">
-            <div style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
-                <img style="height: 300px;" src="assets\data\images\Visualize_img.jpg" alt="failed to load">
+
+            <div style=" display: flex; justify-content: center; align-items: center;">
+                <img style="width: 400px;" src="assets\data\images\Visualize_img.jpg" alt="failed to load">
             </div>
             
-            <span style="flex: 1 0 50px;"></span>
+            <span style="flex: 0 0 20px;"></span>
 
             <div style="flex: 5 1 auto; display: flex; align-items: center;">
-                <ul style="line-height: 50px;">                      
+                <ul style="line-height: 40px;">                      
                     <li> Arouse interest and make learning interactive </li>
                     <li> Make complex Algorithms easier to grasp </li>    
                     <li> Build intuition for computational complexity </li>
@@ -34,26 +43,35 @@
             </div>
     
             
+        </div>          
+
+        <mat-divider style="margin-top: 50px; margin-bottom: 15px;"></mat-divider>
+
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+            <h1 style="display:flex ; justify-content: center;">
+                About Me
+            </h1>
+
+            <span style="flex: 0 0 20px;"></span>
+    
+            <span style="position: relative; top: 2px;">  
+                <a  href="https://www.linkedin.com/in/leon-blum-aa7b5920b/" target="_blank" rel="noreferrer noopener">
+                    <img  
+                        src="assets/data/images/LI-In-Bug.png" 
+                        style="background-color: white; height: 40px;"
+                    >
+                </a>
+            </span>
+            
         </div>
-
-
-
     
 
-
-        
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
-
-        <h1 style="display:flex ; justify-content: center;">
-            About Me
-        </h1>
-
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 15px; margin-bottom: 50px;"></mat-divider>
 
 
 
         <div style="display: flex; flex-flow: row; height: fit-content;">
-            <div style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
+            <div style="display: flex; justify-content: center; align-items: center;">
                 <img style="height: 400px;" src="assets\data\images\Leon_Blum.jpg" alt="failed to load">
             </div>
             
@@ -78,16 +96,16 @@
             
         </div>
 
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 50px; margin-bottom: 15px;"></mat-divider>
 
         <h1 style="display:flex ; justify-content: center;">
             My Story
         </h1>
 
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 15px; margin-bottom: 50px;"></mat-divider>
 
         <div style="display: flex; flex-flow: row; height: fit-content;">
-            <div style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
+            <div style="display: flex; justify-content: center; align-items: center;">
                 <img style="height: 700px;" src="assets\data\images\story.jpg" alt="failed to load">
             </div>
             
@@ -121,25 +139,25 @@
                     After several months of intensive studies, I chose to build a visualization web application using angular. 
                     Including three topics: Pathfinding algorithms, sorting algorithms, and Machine Learning.
                 </p>
-                              
+                                
             </div>
             
         </div>
 
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 50px; margin-bottom: 15px;"></mat-divider>
 
         <h1 style="display:flex ; justify-content: center;">
             Knife Making
         </h1>
 
-        <mat-divider style="margin-top: 50px; margin-bottom: 50px;"></mat-divider>
+        <mat-divider style="margin-top: 15px; margin-bottom: 50px;"></mat-divider>
 
         <div style="display: flex; flex-flow: row; height: fit-content;">
-            <div style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
-                <img style="height: 400px;" src="assets\data\images\Knife.jpg" alt="failed to load">
+            <div style=" display: flex; justify-content: center; align-items: center;">
+                <img style="height: 300px;" src="assets\data\images\Knife.jpg" alt="failed to load">
             </div>
             
-            <span style="flex: 1 0 50px;"></span>
+            <span style="flex: 0 0 20px;"></span>
 
             <div style="flex: 5 1 auto;">
                 <p>
@@ -153,7 +171,7 @@
                     the rewards perseverance can withhold.  
                 </p>
         
-                              
+                                
             </div>
 
             
@@ -165,4 +183,8 @@
 
 
     </div>
+
+
+
+
 </body>
